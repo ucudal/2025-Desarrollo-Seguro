@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 import { setupSwagger } from './swagger'
 
@@ -13,8 +14,14 @@ import authMiddleware from './middleware/auth.middleware';
 import errorHandler from './middleware/errorHandler';
 
 
+
+
+
 dotenv.config();
 const app = express();
+
+// Permitir cualquier origen
+app.use(cors())
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
