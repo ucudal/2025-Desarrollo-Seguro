@@ -2,6 +2,16 @@ import { Request, Response, NextFunction } from 'express';
 import AuthService from '../services/authService';
 import { User } from '../types/user';
 
+
+const ping = async (req: Request, res: Response, next: NextFunction) => {
+  const { username, password } = req.body;
+  try {
+    res.json({"msg":"ok" });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const login = async (req: Request, res: Response, next: NextFunction) => {
   const { username, password } = req.body;
   try {
@@ -135,6 +145,7 @@ export const deletePicture = async (req: Request, res: Response, next: NextFunct
 
 
 export default {
+  ping,
   login,
   forgotPassword,
   resetPassword,

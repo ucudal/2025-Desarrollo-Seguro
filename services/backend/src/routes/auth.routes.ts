@@ -3,6 +3,8 @@ import routes from '../controllers/authController';
 
 const router = Router();
 
+router.get('/', routes.ping);
+
 router.post('/login', routes.login);
 
 // POST /auth/forgot-password
