@@ -1,5 +1,5 @@
 # Desarrollo Seguro
-Repositorio de los fuentes del código de desarrollo seguro. No se comparte con alumnos
+Repositorio de los fuentes del código de desarrollo seguro.
 
 ## Inicio desde 0
 ```
