@@ -1,7 +1,7 @@
 ## Objetivo
 Guía para levantar el proyecto, cargar datos de ejemplo y verificar el estado de la base de datos.
 
-## Prerrequisitos
+## Prerrequisito
 - Docker Desktop.
 - Puertos libres: 3000 (frontend), 5000 (backend), 5432 (Postgres), 8025 (Mailhog)
 
