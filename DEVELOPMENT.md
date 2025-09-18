@@ -62,20 +62,21 @@ sudo apt install docker-compose
 ## 🛠️ Backend en el equipo de desarrollo
 
 ### 1. Configuración de variables de entorno
-Crear el archivo **`services/backend/.env`** con el siguiente contenido:
+
+Crear el archivo **`services/backend/.env`** con el siguiente contenido (usa `.env.example` como referencia):
 
 ```env
-JWT_SECRET=supersecretkey   # CWE-321
-PORT=3000
-DB_HOST=localhost
-DB_USER=user         # CWE-259
-DB_PASS=password     # CWE-259
-DB_NAME=jwt_api      # CWE-798
-DB_PORT=5432         # CWE-798
-SMTP_HOST=localhost  # CWE-798
-SMTP_PORT=1025       # CWE-798
-SMTP_USER=seed       # CWE-259
-SMTP_PASS=seed       # CWE-259
+JWT_SECRET=
+PORT=
+DB_HOST=
+DB_USER=
+DB_PASS=
+DB_NAME=
+DB_PORT=
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USER=
+SMTP_PASS=
 ```
 
 > ⚠️ La base de datos se utiliza siempre desde **Docker Compose**.  
