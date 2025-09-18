@@ -20,14 +20,14 @@ services:
       - "5000:3000"
     environment:
       - DB_HOST=postgres
-      - DB_USER=user
-      - DB_PASS=password
-      - DB_NAME=jwt_api
-      - DB_PORT=5432
-      - SMTP_HOST=mailhog
-      - SMTP_PORT=1025
-      - SMTP_USER=seed
-      - SMTP_PASS=seed
+      - DB_USER=user           # CWE-259
+      - DB_PASS=password       # CWE-259
+      - DB_NAME=jwt_api        # CWE-798
+      - DB_PORT=5432           # CWE-798
+      - SMTP_HOST=mailhog      # CWE-798
+      - SMTP_PORT=1025         # CWE-798
+      - SMTP_USER=seed         # CWE-259
+      - SMTP_PASS=seed         # CWE-259
     restart: unless-stopped
     depends_on:
       postgres:
@@ -46,8 +46,8 @@ services:
     container_name: postgres
     environment:
       POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: jwt_api
+      POSTGRES_PASSWORD: password   # CWE-259
+      POSTGRES_DB: jwt_api          # CWE-798
     ports:
       - "5432:5432"
     volumes:

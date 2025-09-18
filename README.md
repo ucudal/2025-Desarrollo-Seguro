@@ -76,17 +76,17 @@ docker compose up -d postgres mailhog
 # services/backend/.env
 PORT=5000
 DB_HOST=localhost
-DB_USER=user
-DB_PASS=password
-DB_NAME=jwt_api
-DB_PORT=5432
+DB_USER=user         # CWE-259
+DB_PASS=password     # CWE-259
+DB_NAME=jwt_api      # CWE-798
+DB_PORT=5432         # CWE-798
 
-SMTP_HOST=localhost
-SMTP_PORT=1025
-SMTP_USER=seed
-SMTP_PASS=seed
+SMTP_HOST=localhost  # CWE-798
+SMTP_PORT=1025       # CWE-798
+SMTP_USER=seed       # CWE-259
+SMTP_PASS=seed       # CWE-259
 
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:3000 
 ```
 
 ---

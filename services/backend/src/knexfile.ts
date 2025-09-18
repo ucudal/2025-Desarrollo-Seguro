@@ -10,7 +10,7 @@ const config: { [key: string]: Knex.Config } = {
     connection: {
       host: process.env.DB_HOST || 'localhost',
       user: process.env.DB_USER || 'user',
-      password: process.env.DB_PASS || 'password',
+      password: process.env.DB_PASS || 'password', // CWE-259
       database: process.env.DB_NAME || 'jwt_api',
       port: parseInt(process.env.DB_PORT || '5432'),
     },

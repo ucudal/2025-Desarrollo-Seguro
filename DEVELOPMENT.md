@@ -65,17 +65,17 @@ sudo apt install docker-compose
 Crear el archivo **`services/backend/.env`** con el siguiente contenido:
 
 ```env
-JWT_SECRET=supersecretkey
+JWT_SECRET=supersecretkey   # CWE-321
 PORT=3000
 DB_HOST=localhost
-DB_USER=user
-DB_PASS=password
-DB_NAME=jwt_api
-DB_PORT=5432
-SMTP_HOST=localhost
-SMTP_PORT=1025
-SMTP_USER=seed
-SMTP_PASS=seed
+DB_USER=user         # CWE-259
+DB_PASS=password     # CWE-259
+DB_NAME=jwt_api      # CWE-798
+DB_PORT=5432         # CWE-798
+SMTP_HOST=localhost  # CWE-798
+SMTP_PORT=1025       # CWE-798
+SMTP_USER=seed       # CWE-259
+SMTP_PASS=seed       # CWE-259
 ```
 
 > ⚠️ La base de datos se utiliza siempre desde **Docker Compose**.  
