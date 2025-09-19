@@ -63,21 +63,7 @@ sudo apt install docker-compose
 
 ### 1. Configuración de variables de entorno
 
-Crear el archivo **`services/backend/.env`** con el siguiente contenido (usa `.env.example` como referencia):
-
-```env
-JWT_SECRET=
-PORT=
-DB_HOST=
-DB_USER=
-DB_PASS=
-DB_NAME=
-DB_PORT=
-SMTP_HOST=
-SMTP_PORT=
-SMTP_USER=
-SMTP_PASS=
-```
+Crear el archivo **`services/backend/.env`** con el siguiente contenido (usa `.env.example` como referencia)
 
 > ⚠️ La base de datos se utiliza siempre desde **Docker Compose**.  
 > 💡 Se recomienda utilizar **VS Code** para el desarrollo.
