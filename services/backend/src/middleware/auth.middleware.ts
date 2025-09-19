@@ -16,7 +16,7 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
 
   try {
     // const decoded = jwt.verify(token, "secreto_super_seguro"); // CWE-321
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string); // CWE-347
     (req as any).user = decoded;
     next();
   } catch (err) {
