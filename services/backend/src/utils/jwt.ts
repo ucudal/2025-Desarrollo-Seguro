@@ -1,17 +1,23 @@
+
 import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET || JWT_SECRET.length < 32) {
+  throw new Error('JWT_SECRET is missing or too weak. Use at least 32 random characters.'); // CWE-522
+}
+
 
 const generateToken = (userId: string) => {
   return jwt.sign(
     { id: userId },
-    //"secreto_super_seguro", // CWE-321
-    process.env.JWT_SECRET as string, // CWE-522
-    { expiresIn: '1h' } // CWE-327
+    JWT_SECRET,
+    { expiresIn: '1h' }
   );
 };
 
+
 const verifyToken = (token: string) => {
-  // return jwt.verify(token, "secreto_super_seguro"); // CWE-321
-  return jwt.verify(token, process.env.JWT_SECRET as string); // CWE-347
+  return jwt.verify(token, JWT_SECRET);
 };
 
 export default {
