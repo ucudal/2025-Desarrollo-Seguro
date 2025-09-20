@@ -4,6 +4,7 @@ import { Invoice } from '../types/invoice';
 import axios from 'axios';
 import { promises as fs } from 'fs';
 import * as path from 'path';
+import { promises as dns } from 'dns';
 
 interface InvoiceRow {
   id: string;
@@ -36,13 +37,41 @@ class InvoiceService {
     ccv: string,
     expirationDate: string
   ) {
-    // use axios to call http://paymentBrand/payments as a POST request
-    // with the body containing ccNumber, ccv, expirationDate
-    // and handle the response accordingly
-    const paymentResponse = await axios.post(`http://${paymentBrand}/payments`, {
+    // VULNERABILIDAD SSRF (CWE-918):
+    // Esta línea permite que el cliente controle el host y puerto de destino de la petición.
+    // const paymentResponse = await axios.post(`http://${paymentBrand}/payments`, {
+    //   ccNumber,
+    //   ccv,
+    //   expirationDate
+    // });
+
+    // MITIGACIÓN aplicada:
+    // Se valida el hostname, resolviendo su IP y bloqueando redes privadas (127.*, 10.*, etc).
+    // También se establece un timeout y se impide seguir redirecciones.
+    const url = new URL(`http://${paymentBrand}/payments`);
+    const hostname = url.hostname;
+
+    const isPrivateIp = (ip: string): boolean =>
+      /^127\.|^10\.|^192\.168\.|^169\.254\.|^172\.(1[6-9]|2[0-9]|3[0-1])/.test(ip);
+
+    const lookupResult = await dns.lookup(hostname, { family: 4 });
+    const address = typeof lookupResult === 'string' ? lookupResult : lookupResult.address;
+
+    if (!address) {
+      throw new Error('No se pudo resolver el host de destino');
+    }
+
+    if (isPrivateIp(address)) {
+      throw new Error('Destino interno no permitido');
+    }
+
+    const paymentResponse = await axios.post(url.toString(), {
       ccNumber,
       ccv,
       expirationDate
+    }, {
+      timeout: 5000,
+      maxRedirects: 0
     });
     if (paymentResponse.status !== 200) {
       throw new Error('Payment failed');
