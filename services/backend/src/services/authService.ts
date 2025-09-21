@@ -4,6 +4,7 @@ import nodemailer from 'nodemailer';
 import db from '../db';
 import { User,UserRow } from '../types/user';
 import jwtUtils from '../utils/jwt';
+import hashUtils from '../utils/hash'
 import ejs from 'ejs';
 
 const RESET_TTL = 1000 * 60 * 60;         // 1h
@@ -20,14 +21,19 @@ class AuthService {
     // create invite token
     const invite_token = crypto.randomBytes(6).toString('hex');
     const invite_token_expires = new Date(Date.now() + INVITE_TTL);
+
+    // Hashear la contraseña y el token de activación de cuenta.
+    const hashed_input_password = await hashUtils.hashPlainText(user.password);
+    const hashed_invite_token = await hashUtils.hashPlainText(invite_token);
+    
     await db<UserRow>('users')
       .insert({
         username: user.username,
-        password: user.password,
+        password: hashed_input_password, // Guardar el dato hasheado en la base de datos.
         email: user.email,
         first_name: user.first_name,
         last_name:  user.last_name,
-        invite_token,
+        invite_token: hashed_invite_token, // Guardar el dato hasheado en la base de datos.
         invite_token_expires,
         activated: false
       });
@@ -64,11 +70,15 @@ class AuthService {
       .where({ id: user.id })
       .first();
     if (!existing) throw new Error('User not found');
+
+    // Hashear la contraseña.
+    const hashed_input_password = await hashUtils.hashPlainText(user.password);
+
     await db<UserRow>('users')
       .where({ id: user.id })
       .update({
         username: user.username,
-        password: user.password,
+        password: hashed_input_password, // Guardar el dato hasheado en la base de datos.
         email: user.email,
         first_name: user.first_name,
         last_name: user.last_name
@@ -82,7 +92,15 @@ class AuthService {
       .andWhere('activated', true)
       .first();
     if (!user) throw new Error('Invalid email or not activated');
-    if (password != user.password) throw new Error('Invalid password');
+
+    // Comparar.
+    const hashed_saved_password = user.password; // El dato viene de la base de datos.
+    const hashed_input_password = await hashUtils.hashPlainText(password);
+    const is_authenticated = await hashUtils.compareHashedPlainText(
+      hashed_input_password,
+      hashed_saved_password);
+
+    if (is_authenticated == true) throw new Error('Invalid password');
     return user;
   }
 
@@ -96,10 +114,13 @@ class AuthService {
     const token = crypto.randomBytes(6).toString('hex');
     const expires = new Date(Date.now() + RESET_TTL);
 
+    // Hashear el token de reseteo de contraseña.
+    const hashed_reset_password_token = await hashUtils.hashPlainText(token)
+
     await db('users')
       .where({ id: user.id })
       .update({
-        reset_password_token: token,
+        reset_password_token: hashed_reset_password_token, // Guardar el dato hasheado en la base de datos.
         reset_password_expires: expires
       });
 
@@ -122,31 +143,43 @@ class AuthService {
   }
 
   static async resetPassword(token: string, newPassword: string) {
+    // Hashear token de reseteo de contraseña.
+    const hashed_input_reset_password_token = await hashUtils.hashPlainText(token);
+
     const row = await db<UserRow>('users')
-      .where('reset_password_token', token)
+      .where('reset_password_token', hashed_input_reset_password_token) // Comparar
       .andWhere('reset_password_expires', '>', new Date())
       .first();
     if (!row) throw new Error('Invalid or expired reset token');
 
+    // Hashear contraseña.
+    const hashed_input_password = await hashUtils.hashPlainText(newPassword);
+
     await db('users')
       .where({ id: row.id })
       .update({
-        password: newPassword,
+        password: hashed_input_password, // Guardar el dato hasheado en la base de datos.
         reset_password_token: null,
         reset_password_expires: null
       });
   }
 
   static async setPassword(token: string, newPassword: string) {
+    // Hashear token de activación de cuenta.
+    const hashed_input_invite_token = await hashUtils.hashPlainText(token)
+
     const row = await db<UserRow>('users')
-      .where('invite_token', token)
+      .where('invite_token', hashed_input_invite_token) // Comparar.
       .andWhere('invite_token_expires', '>', new Date())
       .first();
     if (!row) throw new Error('Invalid or expired invite token');
 
+    // Hashear contraseña.
+    const hashed_input_password = await hashUtils.hashPlainText(newPassword)
+
     await db('users')
       .update({
-        password: newPassword,
+        password: hashed_input_password, // Guardar el dato hasheado en la base de datos.
         invite_token: null,
         invite_token_expires: null
       })
