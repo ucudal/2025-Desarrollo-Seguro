@@ -91,7 +91,8 @@ class InvoiceService {
       throw new Error('Invoice not found');
     }
     try {
-      const filePath = `/invoices/${pdfName}`;
+      const safeFileName = path.basename(pdfName);
+      const filePath = path.join('/invoices', safeFileName);
       const content = await fs.readFile(filePath, 'utf-8');
       return content;
     } catch (error) {
