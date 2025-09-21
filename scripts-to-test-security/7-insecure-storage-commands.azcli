@@ -1,0 +1,53 @@
+# Para recompilar y levantar el contenedor.
+sudo docker compose -f "docker-compose.yaml" up -d --build
+
+# Crea el primer usuario.
+curl -X POST http://localhost:5000/users/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "lucia.bonilla",
+    "password": "lucia123",
+    "email": "lucia.bonilla@correo.ucu.edu.uy",
+    "first_name": "lucia",
+    "last_name": "bonilla"
+  }'
+
+# Crea el segundo usuario
+curl -X POST http://localhost:5000/users/ \
+-H "Content-Type: application/json" \
+-d '{
+  "username": "micaela.martinez",
+  "password": "micaela123",
+  "email": "bonillalucia7@gmail.com",
+  "first_name": "micaela",
+  "last_name": "martinez"
+}'
+
+# Para ver los usuarios en la base de datos (ejecutar en la terminal del contenedor de la base de datos (postgres)).
+psql -U user -d jwt_api
+
+SELECT * FROM users;
+
+# Para simular la migración de texto plano -> texto hasheado de datos sensibles (ejecutar en la terminal local).
+docker exec -it backend npx ts-node scripts/hashPlainTextData.ts --dry-run
+
+# Para realizar la migración real.
+docker exec -it backend npx ts-node scripts/hashPlainTextData.ts
+
+# Para activar las cuentas a través de la base de datos (ejecutar en la terminal del contenedor de la base de datos (postgres)).
+UPDATE users SET activated = true;
+
+# Para probar el login con ambos usuarios.
+curl -X POST http://localhost:5000/auth/login \
+-H "Content-Type: application/json" \
+-d '{
+  "username": "lucia.bonilla",
+  "password": "lucia123"
+}'
+
+curl -X POST http://localhost:5000/auth/login \
+-H "Content-Type: application/json" \
+-d '{
+  "username": "micaela.martinez",
+  "password": "micaela123"
+}'
