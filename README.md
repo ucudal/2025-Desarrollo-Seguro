@@ -86,6 +86,8 @@ SMTP_PORT=1025
 SMTP_USER=seed
 SMTP_PASS=seed
 
+JWT_SECRET=supersecretkey
+
 FRONTEND_URL=http://localhost:3000
 ```
 

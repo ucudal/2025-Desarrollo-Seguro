@@ -80,6 +80,7 @@ DB_USER=user
 DB_PASS=password
 DB_NAME=jwt_api
 DB_PORT=5432
+JWT_SECRET=supersecretkey
 
 SMTP_HOST=localhost
 SMTP_PORT=1025
