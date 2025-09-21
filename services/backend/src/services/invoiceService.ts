@@ -47,11 +47,22 @@ class InvoiceService {
     // use axios to call http://paymentBrand/payments as a POST request
     // with the body containing ccNumber, ccv, expirationDate
     // and handle the response accordingly
-    const paymentResponse = await axios.post(`http://${paymentBrand}/payments`, {
+    const ALLOWED_BRANDS = new Set(['visa', 'mastercard']);
+    if (!ALLOWED_BRANDS.has(paymentBrand.toLowerCase())) {
+      throw new Error('Invalid payment brand');
+    }
+    const BRAND_URLS: Record<string, string> = {
+      visa: 'payments.visa.local',
+      mastercard: 'payments.mastercard.local'
+    };
+
+    const url = BRAND_URLS[paymentBrand.toLowerCase()];
+    const paymentResponse = await axios.post(`http://${url}/payments`, {
       ccNumber,
       ccv,
       expirationDate
     });
+
     if (paymentResponse.status !== 200) {
       throw new Error('Payment failed');
     }
