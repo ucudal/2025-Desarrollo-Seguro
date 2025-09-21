@@ -36,14 +36,19 @@ class InvoiceService {
     ccv: string,
     expirationDate: string
   ) {
-    // use axios to call http://paymentBrand/payments as a POST request
-    // with the body containing ccNumber, ccv, expirationDate
-    // and handle the response accordingly
-    const paymentResponse = await axios.post(`http://${paymentBrand}/payments`, {
-      ccNumber,
-      ccv,
-      expirationDate
-    });
+    const allowedPaymentBrands: { [key: string]: string } = {
+      visa: 'http://visa/payments',
+      mastercard: 'http://mastercard/payments',
+      americanexpress: 'http://americanexpress/payments',
+    };
+
+    const url = allowedPaymentBrands[paymentBrand.toLowerCase()];
+    if (!url) {
+      throw new Error('Payment brand not allowed');
+    }
+
+    const paymentResponse = await axios.post(url, { ccNumber, ccv, expirationDate });
+
     if (paymentResponse.status !== 200) {
       throw new Error('Payment failed');
     }
