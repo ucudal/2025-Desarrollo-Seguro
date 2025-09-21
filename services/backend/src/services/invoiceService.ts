@@ -14,17 +14,25 @@ interface InvoiceRow {
 }
 
 class InvoiceService {
-  static async list( userId: string, status?: string, operator?: string): Promise<Invoice[]> {
-    let q = db<InvoiceRow>('invoices').where({ userId: userId });
-    if (status) q = q.andWhereRaw(" status "+ operator + " '"+ status +"'");
+  static async list(userId: string, status?: string, operator?: string): Promise<Invoice[]> {
+    const ALLOWED_OPS = new Set(['=', '!=']);
+    const ALLOWED_STATUS = new Set(['paid', 'unpaid']);
+    let q = db<InvoiceRow>('invoices').where({ userId });
+    if (status && operator) {
+      if (!ALLOWED_OPS.has(operator)) throw new Error('Invalid operator');
+      if (!ALLOWED_STATUS.has(status)) throw new Error('Invalid status');
+      // Binding seguro con Knex
+      q = q.andWhere('status', operator as any, status);
+    }
     const rows = await q.select();
     const invoices = rows.map(row => ({
       id: row.id,
       userId: row.userId,
       amount: row.amount,
       dueDate: row.dueDate,
-      status: row.status} as Invoice
-    ));
+      status: row.status
+    } as Invoice));
+
     return invoices;
   }
 
@@ -51,16 +59,16 @@ class InvoiceService {
     // Update the invoice status in the database
     await db('invoices')
       .where({ id: invoiceId, userId })
-      .update({ status: 'paid' });  
-    };
-  static async  getInvoice( invoiceId:string): Promise<Invoice> {
+      .update({ status: 'paid' });
+  }
+
+  static async getInvoice(invoiceId: string): Promise<Invoice> {
     const invoice = await db<InvoiceRow>('invoices').where({ id: invoiceId }).first();
     if (!invoice) {
       throw new Error('Invoice not found');
     }
     return invoice as Invoice;
   }
-
 
   static async getReceipt(
     invoiceId: string,
@@ -79,11 +87,8 @@ class InvoiceService {
       // send the error to the standard output
       console.error('Error reading receipt file:', error);
       throw new Error('Receipt not found');
-
-    } 
-
-  };
-
-};
+    }
+  }
+}
 
 export default InvoiceService;
