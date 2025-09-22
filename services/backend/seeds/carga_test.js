@@ -53,5 +53,6 @@ exports.seed = async function(knex) {
     amount: 99.00,
     dueDate: new Date('2025-01-01'),
     status: 'unpaid'
-   }]);
+   }]).onConflict('username')  // si username ya existe
+  .ignore();
 };
