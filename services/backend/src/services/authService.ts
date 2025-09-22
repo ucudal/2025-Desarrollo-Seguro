@@ -95,7 +95,7 @@ class AuthService {
       .where({ id: user.id })
       .first();
     if (!existing) throw new Error('User not found');
-    // 🔴 VULNERABILIDAD: actualizar la contraseña sin hash mantiene el almacén inseguro.
+    // VULNERABILIDAD: actualizar la contraseña sin hash mantiene el almacén inseguro.
     // await db<UserRow>('users')
     //   .where({ id: user.id })
     //   .update({
@@ -106,7 +106,7 @@ class AuthService {
     //     last_name: user.last_name
     //   });
 
-    // ✅ MITIGACIÓN: recalcular el hash cuando se actualiza la contraseña.
+    // MITIGACIÓN: recalcular el hash cuando se actualiza la contraseña.
     const updatedPassword = user.password
       ? await bcrypt.hash(user.password, 12)
       : existing.password;

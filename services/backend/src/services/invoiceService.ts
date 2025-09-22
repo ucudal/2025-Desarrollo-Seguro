@@ -58,7 +58,7 @@ class InvoiceService {
     const address = typeof lookupResult === 'string' ? lookupResult : lookupResult.address;
 
     if (!address) {
-      throw new Error('No se pudo resolver el host de destino');
+      throw new Error('No se pudo resSolver el host de destino');
     }
 
     if (isPrivateIp(address)) {
