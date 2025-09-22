@@ -1,0 +1,46 @@
+# Crea el primer usuario.
+curl -X POST http://localhost:5000/users/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "lucia.bonilla",
+    "password": "lucia123",
+    "email": "lucia.bonilla@correo.ucu.edu.uy",
+    "first_name": "lucia",
+    "last_name": "bonilla"
+  }'
+
+# Crea el segundo usuario.
+curl -X POST http://localhost:5000/users/ \
+-H "Content-Type: application/json" \
+-d '{
+  "username": "micaela.martinez",
+  "password": "micaela123",
+  "email": "bonillalucia7@gmail.com",
+  "first_name": "micaela",
+  "last_name": "martinez"
+}'
+
+# En la terminal del contenedor Docker de la base de datos (postgres).
+psql -U user -d jwt_api
+
+# Crea una factura para lucia.bonilla
+INSERT INTO invoices ("userId", amount, "dueDate", status) VALUES (1, 120.50, '2025-09-30', 'unpaid');
+
+# Para probar el login con ambos usuarios.
+curl -X POST http://localhost:5000/auth/login \
+-H "Content-Type: application/json" \
+-d '{
+  "username": "lucia.bonilla",
+  "password": "lucia123"
+}'
+
+curl -X POST http://localhost:5000/auth/login \
+-H "Content-Type: application/json" \
+-d '{
+  "username": "micaela.martinez",
+  "password": "micaela123"
+}'
+
+# Para obtener la factura con ID = 1
+curl -X GET "http://localhost:5000/invoices/1" \
+  -H "Authorization: Bearer TOKEN_AQUI"
