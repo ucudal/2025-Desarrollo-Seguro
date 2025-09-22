@@ -99,7 +99,7 @@ class AuthService {
       password, // Contraseña que da el usuario en texto plano.
       hashed_saved_password);
 
-    if (is_authenticated == true) throw new Error('Invalid password');
+    if (is_authenticated != true) throw new Error('Invalid password');
     return user;
   }
 
