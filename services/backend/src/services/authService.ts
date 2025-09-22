@@ -95,9 +95,8 @@ class AuthService {
 
     // Comparar.
     const hashed_saved_password = user.password; // El dato viene de la base de datos.
-    const hashed_input_password = await hashUtils.hashPlainText(password);
     const is_authenticated = await hashUtils.compareHashedPlainText(
-      hashed_input_password,
+      user.password, // Contraseña que da el usuario en texto plano.
       hashed_saved_password);
 
     if (is_authenticated == true) throw new Error('Invalid password');
