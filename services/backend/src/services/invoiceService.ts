@@ -14,19 +14,40 @@ interface InvoiceRow {
 }
 
 class InvoiceService {
-  static async list( userId: string, status?: string, operator?: string): Promise<Invoice[]> {
+  static async list(userId: string, status?: string, operator?: string): Promise<Invoice[]> {
     let q = db<InvoiceRow>('invoices').where({ userId: userId });
-    if (status) q = q.andWhereRaw(" status "+ operator + " '"+ status +"'");
+
+    if (status) {
+      // Normalizar y validar status
+      const stat = String(status).trim();
+      if (stat.length === 0 || stat.length > 200) {
+        throw new Error('Invalid status value');
+      }
+
+      // Whitelist de operadores permitidos
+      const allowedOperators = ['=', '<>', '!=', '<', '<=', '>', '>=', 'LIKE'];
+      const op = (operator || '=').toUpperCase();
+
+      if (!allowedOperators.includes(op)) {
+        throw new Error('Invalid operator');
+      }
+
+      // Usar binding en la consulta
+      q = q.andWhere('status', op as any, stat);
+    }
+
     const rows = await q.select();
     const invoices = rows.map(row => ({
       id: row.id,
       userId: row.userId,
       amount: row.amount,
       dueDate: row.dueDate,
-      status: row.status} as Invoice
-    ));
+      status: row.status
+    } as Invoice));
+
     return invoices;
   }
+
 
   static async setPaymentCard(
     userId: string,
