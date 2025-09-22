@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import AuthService from '../services/authService';
 import { User } from '../types/user';
+import inputUtils from '../utils/input';
 
 
 const ping = async (req: Request, res: Response, next: NextFunction) => {
@@ -57,12 +58,26 @@ const setPassword = async (req: Request, res: Response, next: NextFunction) => {
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   const { username, password, email, first_name, last_name } = req.body;
   try {
+    // Campos requeridos.
+    if (!username || !password || !email || !first_name || !last_name) {
+      res.status(422).json("Faltan datos.");
+    }
+
+    // Verificar que son datos válidos.
+    if (!inputUtils.isValidUsername(username)
+    || !inputUtils.isValidEmail(email)
+    || !inputUtils.isValidName(first_name)
+    || !inputUtils.isValidName(last_name)) {
+      res.status(400).json("Los datos no son válidos.");
+    }
+    
+    // Quitar espacios en blanco (a excepción de la contraseña).
     const user: User = {
-      username,
+      username: username.trim(),
       password,
-      email,
-      first_name,
-      last_name
+      email: email.trim(),
+      first_name: first_name.trim(),
+      last_name: last_name.trim()
     };
     const userDB = await AuthService.createUser(user);
     res.status(201).json(userDB);
