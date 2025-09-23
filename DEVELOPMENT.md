@@ -104,11 +104,7 @@ curl -X POST "http://localhost:3000/auth/login" \
 ## 🎨 Frontend
 
 ### 1. Configuración de variables de entorno
-Crear el archivo **`services/frontend/.env`** con el siguiente contenido:
-
-```env
-VITE_API_BASE_URL=http://localhost:3000
-```
+Crear el archivo **`services/frontend/.env`** con el siguiente contenido (usa `.env.example` como referencia)
 
 ---
 

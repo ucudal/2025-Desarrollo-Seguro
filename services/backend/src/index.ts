@@ -41,7 +41,7 @@ app.use('/invoices', invoiceRoutes);
 // Global error handler
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📖 Swagger UI: http://localhost:${PORT}/api-docs`)

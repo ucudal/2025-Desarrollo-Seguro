@@ -5,9 +5,8 @@ import { Invoice } from '../types/invoice';
 const listInvoices = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const state = req.query.status as string | undefined;
-    //const operator = req.query.operator as string | undefined;
     const id   = (req as any).user!.id; 
-    const invoices = await InvoiceService.list(id, state/*,operator*/);
+    const invoices = await InvoiceService.list(id, state);
     res.json(invoices);
   } catch (err) {
     next(err);

@@ -19,30 +19,21 @@ services:
     ports:
       - "5000:3000"
     environment:
-      #- DB_HOST=postgres
       - DB_HOST=${DB_HOST}
-      #- DB_USER=user           # CWE-259
       - DB_USER=${DB_USER}
-      #- DB_PASS=password       # CWE-259
       - DB_PASS=${DB_PASS}
-      #- DB_NAME=jwt_api        # CWE-798
       - DB_NAME=${DB_NAME}
-      #- DB_PORT=5432           # CWE-798
       - DB_PORT=${DB_PORT}
-      #- SMTP_HOST=mailhog      # CWE-798
       - SMTP_HOST=${SMTP_HOST}
-      #- SMTP_PORT=1025         # CWE-798
       - SMTP_PORT=${SMTP_PORT}
-      #- SMTP_USER=seed         # CWE-259
       - SMTP_USER=${SMTP_USER}
-      #- SMTP_PASS=seed         # CWE-259
       - SMTP_PASS=${SMTP_PASS}
     restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/auth/"]
+      test: ["CMD", "curl", "-f", "${FRONTEND_URL}/auth/"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -54,11 +45,8 @@ services:
     image: postgres:latest
     container_name: postgres
     environment:
-      #POSTGRES_USER: user
       POSTGRES_USER: ${POSTGRES_USER}
-      #POSTGRES_PASSWORD: password   # CWE-259
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      #POSTGRES_DB: jwt_api          # CWE-798
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"

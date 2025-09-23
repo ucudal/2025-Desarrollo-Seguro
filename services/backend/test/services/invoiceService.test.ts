@@ -36,10 +36,9 @@ describe('AuthService.generateJwt', () => {
     };
     mockedDb.mockReturnValue(selectChain as any);
 
-    const invoices = await InvoiceService.list(userId, state/*, operator*/);
+    const invoices = await InvoiceService.list(userId, state);
 
     expect(mockedDb().where).toHaveBeenCalledWith({ userId });
-    //expect(mockedDb().andWhere).toHaveBeenCalledWith('state', operator, state);
     expect(mockedDb().andWhere).toHaveBeenCalledWith('state', 'eq', state);
     expect(mockedDb().select).toHaveBeenCalled();
     expect(invoices).toEqual(mockInvoices);

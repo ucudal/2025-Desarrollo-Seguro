@@ -5,6 +5,10 @@ import swaggerUi from 'swagger-ui-express'
 import path from 'path'
 
 /** 1) Define basic info and where to look for JSDoc comments */
+
+const FRONTEND_URL = process.env.FRONTEND_URL;
+const SERVER_URL = process.env.SERVER_URL;
+
 const options: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.0',
@@ -14,8 +18,8 @@ const options: swaggerJsdoc.Options = {
       description: '🚀 Auto-generated Swagger docs via swagger-jsdoc',
     },
     servers: [
-      { url: 'http://localhost:3000', description: 'Local dev server' },
-      { url: 'http://localhost:5000', description: 'Local dev server' },
+      { url: FRONTEND_URL, description: 'Frontend URL' },
+      { url: SERVER_URL, description: 'Backend API URL' },
     ],
   },
   // 2) Tell it where your route files live, so it can extract @swagger‐style JSDoc

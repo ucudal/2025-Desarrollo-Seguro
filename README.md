@@ -72,9 +72,7 @@ docker compose up -d postgres mailhog
 ---
 
 #### 2) Crear `.env` en `services/backend`
-```ini
-# services/backend/.env
-# Usa .env.example como referencia para saber que varibles debes de tener configuradas como variables de entorno. 
+ Usa .env.example como referencia para saber que variables debes de tener configuradas como variables de entorno. 
 
 ---
 
@@ -87,13 +85,12 @@ npx knex --knexfile src/knexfile.ts migrate:latest
 npx knex --knexfile src/knexfile.ts seed:run
 ```
 
----
 
 #### 4) Ejecutar el backend en modo desarrollo
 ```powershell
 npx ts-node-dev src/index.ts
 ```
-- Servidor en: `http://localhost:5000`
+- Servidor en: `http://localhost:5000` 
 
 ---
 
