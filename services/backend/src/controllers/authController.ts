@@ -55,14 +55,14 @@ const setPassword = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
-  const { username, password, email, first_name, last_name } = req.body;
+  const { email, password, firstName, lastName } = req.body;
   try {
     const user: User = {
-      username,
+      username: email, // Using email as username
       password,
       email,
-      first_name,
-      last_name
+      first_name: firstName,
+      last_name: lastName
     };
     const userDB = await AuthService.createUser(user);
     res.status(201).json(userDB);

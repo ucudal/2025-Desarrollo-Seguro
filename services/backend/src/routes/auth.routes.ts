@@ -7,6 +7,9 @@ router.get('/', routes.ping);
 
 router.post('/login', routes.login);
 
+// POST /auth/register
+router.post('/register', routes.createUser);
+
 // POST /auth/forgot-password
 router.post('/forgot-password', routes.forgotPassword);
 
