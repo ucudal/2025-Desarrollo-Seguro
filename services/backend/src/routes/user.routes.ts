@@ -3,6 +3,12 @@ import routes from '../controllers/authController';
 
 const router = Router();
 
+// VULNERABILIDAD: Missing Authorization
+// CWE-862: Missing Authorization
+// Las rutas de usuario no tienen middleware de autenticación aplicado.
+// Cualquier persona puede crear o actualizar usuarios sin estar autenticada.
+// Debería aplicarse el middleware authenticateJWT a estas rutas sensibles.
+
 // POST /auth to create a new user
 // This route is typically used for user registration
 router.post('/', routes.createUser);

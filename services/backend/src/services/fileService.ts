@@ -25,6 +25,12 @@ class FileService {
       .update({ picture_path: file.path })
       .where({ id: userId });
 
+      // Esto no es seguro
+      /*Directory Traversal (o Path Traversal). 
+      Un atacante podría aprovechar esta vulnerabilidad si se permite que el nombre del archivo contenga caracteres especiales, 
+      lo que le permitiría acceder a archivos fuera del directorio de subidas. 
+      CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal').
+      */
     return `${process.env.API_BASE_URL}/uploads/${path.basename(file.path)}`;
   }
 

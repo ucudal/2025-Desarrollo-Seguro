@@ -17,6 +17,11 @@ const listInvoices = async (req: Request, res: Response, next: NextFunction) => 
 const setPaymentCard = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const invoiceId = req.params.id;
+    // VULNERABILIDAD: Almacenamiento Inseguro de Información Sensible
+    // CWE-922: Insecure Storage of Sensitive Information
+    // Los datos de tarjeta de crédito (número, CCV, fecha de expiración) se manejan en texto plano
+    // y se envían a servicios externos sin cifrado adicional.
+    // Los datos de tarjetas deberían ser tokenizados y nunca almacenados o transmitidos en texto plano.
     const paymentBrand = req.body.paymentBrand;
     const ccNumber = req.body.ccNumber;
     const ccv = req.body.ccv;
@@ -49,6 +54,11 @@ const getInvoicePDF = async (req: Request, res: Response, next: NextFunction) =>
     if (!pdfName) {
       return res.status(400).json({ error: 'Missing parameter pdfName' });
     }
+    // VULNERABILIDAD: Missing Authorization
+    // CWE-862: Missing Authorization
+    // Similar al problema anterior, no se verifica si el usuario tiene derecho a descargar
+    // el PDF de esta factura específica. Un atacante podría acceder a PDFs de otros usuarios.
+    // Esto no es seguro
     const pdf = await InvoiceService.getReceipt(invoiceId, pdfName);
     // return the pdf as a binary response
     res.setHeader('Content-Type', 'application/pdf');
@@ -62,6 +72,12 @@ const getInvoicePDF = async (req: Request, res: Response, next: NextFunction) =>
 const getInvoice = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const invoiceId = req.params.id;
+    // VULNERABILIDAD: Missing Authorization
+    // CWE-862: Missing Authorization
+    // Esta función no verifica si el usuario autenticado tiene derecho a acceder a esta factura específica.
+    // Un atacante podría cambiar el ID en la URL para acceder a facturas de otros usuarios.
+    // Debería verificar que la factura pertenezca al usuario autenticado antes de devolverla.
+    // Esto no es seguro
     const invoice = await InvoiceService.getInvoice(invoiceId);
     res.status(200).json(invoice);
 

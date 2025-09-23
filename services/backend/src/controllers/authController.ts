@@ -75,6 +75,11 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.params.id;
   const { username, password, email, first_name, last_name } = req.body;
   try {
+  // VULNERABILIDAD: Missing Authorization
+  // CWE-862: Missing Authorization
+  // Esta función permite actualizar cualquier usuario por ID sin verificar si el usuario
+  // autenticado tiene derecho a modificar ese usuario específico. Un atacante podría
+  // modificar datos de otros usuarios cambiando el ID en la URL.
   const user: User = {
       username,
       password,

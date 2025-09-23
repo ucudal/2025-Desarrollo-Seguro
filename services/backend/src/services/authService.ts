@@ -42,6 +42,12 @@ class AuthService {
     });
     const link = `${process.env.FRONTEND_URL}/activate-user?token=${invite_token}&username=${user.username}`;
    
+    // VULNERABILIDAD: Template Command Injection
+    // CWE-94: Improper Control of Generation of Code ('Code Injection')
+    // Los datos del usuario (first_name, last_name) se insertan directamente en la plantilla HTML
+    // sin escapar ni sanitizar. Un atacante podría insertar código JavaScript malicioso
+    // en los campos de nombre que se ejecutaría cuando se renderice el email.
+    // Por ejemplo: first_name = "<script>alert('XSS')</script>" 
     const template = `
       <html>
         <body>
@@ -82,6 +88,12 @@ class AuthService {
       .andWhere('activated', true)
       .first();
     if (!user) throw new Error('Invalid email or not activated');
+    // VULNERABILIDAD: Almacenamiento Inseguro (Insecure Storage)
+    // CWE-922: Insecure Storage of Sensitive Information
+    // Las contraseñas se almacenan y comparan en texto plano sin ningún tipo de hash.
+    // Esto significa que si la base de datos es comprometida, todas las contraseñas
+    // estarían expuestas directamente. Debería usarse bcrypt o similar para hashear las contraseñas.
+    // Esto no es seguro
     if (password != user.password) throw new Error('Invalid password');
     return user;
   }
