@@ -43,13 +43,16 @@ const setPaymentCard = async (req: Request, res: Response, next: NextFunction) =
 
 const getInvoicePDF = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // La id se obtiene del token de autorización.
+    const userId   = (req as any).user!.id;
     const invoiceId = req.params.id;
     const pdfName = req.query.pdfName as string | undefined;
 
     if (!pdfName) {
       return res.status(400).json({ error: 'Missing parameter pdfName' });
     }
-    const pdf = await InvoiceService.getReceipt(invoiceId, pdfName);
+    // También se envía la id de usuario al servicio.
+    const pdf = await InvoiceService.getReceipt(invoiceId, userId, pdfName);
     // return the pdf as a binary response
     res.setHeader('Content-Type', 'application/pdf');
     res.send(pdf);
@@ -61,8 +64,11 @@ const getInvoicePDF = async (req: Request, res: Response, next: NextFunction) =>
 
 const getInvoice = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // La id se obtiene del token de autorización.
+    const userId   = (req as any).user!.id;
     const invoiceId = req.params.id;
-    const invoice = await InvoiceService.getInvoice(invoiceId);
+    // También se envía la id de usuario al servicio.
+    const invoice = await InvoiceService.getInvoice(invoiceId, userId);
     res.status(200).json(invoice);
 
   } catch (err) {

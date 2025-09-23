@@ -54,21 +54,26 @@ class InvoiceService {
       .where({ id: invoiceId, userId })
       .update({ status: 'paid' });  
     };
-  static async  getInvoice( invoiceId:string): Promise<Invoice> {
-    const invoice = await db<InvoiceRow>('invoices').where({ id: invoiceId }).first();
+
+  static async getInvoice(invoiceId: string, userId: string): Promise<Invoice> {
+    const invoice = await db<InvoiceRow>('invoices')
+      .where({ id: invoiceId, userId: userId }) // <-- fuerza propiedad.
+      .first();
     if (!invoice) {
       throw new Error('Invoice not found');
     }
     return invoice as Invoice;
   }
 
-
   static async getReceipt(
     invoiceId: string,
+    userId: string,
     pdfName: string
   ) {
     // check if the invoice exists
-    const invoice = await db<InvoiceRow>('invoices').where({ id: invoiceId }).first();
+    const invoice = await db<InvoiceRow>('invoices')
+      .where({ id: invoiceId, userId: userId }) // <-- fuerza propiedad.
+      .first();
     if (!invoice) {
       throw new Error('Invoice not found');
     }
@@ -82,7 +87,6 @@ class InvoiceService {
       throw new Error('Receipt not found');
 
     } 
-
   };
 
 };
