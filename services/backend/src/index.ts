@@ -1,6 +1,9 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import path from 'path';
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') }) 
 
 import { setupSwagger } from './swagger'
 
@@ -13,11 +16,6 @@ import invoiceRoutes from './routes/invoices.routes';
 import authMiddleware from './middleware/auth.middleware';
 import errorHandler from './middleware/errorHandler';
 
-
-
-
-
-dotenv.config();
 const app = express();
 
 // Permitir cualquier origen

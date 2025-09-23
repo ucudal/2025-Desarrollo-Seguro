@@ -6,6 +6,8 @@ services:
     container_name: frontend
     ports:
       - "3000:80"
+    env_file:
+    - ./services/frontend/.env
     restart: unless-stopped
     depends_on:
       backend:
@@ -18,23 +20,14 @@ services:
     container_name: backend
     ports:
       - "5000:3000"
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_USER=${DB_USER}
-      - DB_PASS=${DB_PASS}
-      - DB_NAME=${DB_NAME}
-      - DB_PORT=${DB_PORT}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_PORT=${SMTP_PORT}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASS=${SMTP_PASS}
-      - JWT_SECRET=${JWT_SECRET}
+    env_file:
+    - ./services/backend/.env
     restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "${FRONTEND_URL}/auth/"]
+      test: ["CMD-SHELL", "curl -f $${CHECK_HEALTH_SERVER_URL} || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -45,12 +38,10 @@ services:
   postgres:
     image: postgres:latest
     container_name: postgres
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
+    env_file:
+    - ./.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped

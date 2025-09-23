@@ -68,7 +68,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     || !inputUtils.isValidEmail(email)
     || !inputUtils.isValidName(first_name)
     || !inputUtils.isValidName(last_name)) {
-      res.status(400).json("Los datos no son válidos.");
+      res.status(400).json("Los datos no están en el formato requerido.");
     }
     
     // Quitar espacios en blanco (a excepción de la contraseña).
