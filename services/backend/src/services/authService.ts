@@ -130,7 +130,7 @@ class AuthService {
     if (!user) throw new Error('Invalid email or not activated');
     // VULNERABILIDAD: comparar textos planos permite que contraseñas en la base sigan sin hash.
     // if (password != user.password) throw new Error('Invalid password');
-
+    
     // MITIGACIÓN: usar bcrypt.compare contra el hash almacenado.
     const passwordMatches = await bcrypt.compare(password, user.password);
     if (!passwordMatches) throw new Error('Invalid password');
@@ -221,7 +221,8 @@ class AuthService {
       .update({
         password: hashedNewPassword,
         invite_token: null,
-        invite_token_expires: null
+        invite_token_expires: null,
+        activated: true
       })
       .where({ id: row.id });
   }
