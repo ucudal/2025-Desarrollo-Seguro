@@ -7,7 +7,7 @@ import inputUtils from '../utils/input';
 const ping = async (req: Request, res: Response, next: NextFunction) => {
   const { username, password } = req.body;
   try {
-    res.json({"msg":"ok" });
+    return res.json({"msg":"ok" });
   } catch (err) {
     next(err);
   }
@@ -18,7 +18,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = await AuthService.authenticate(username, password);
     const token = await AuthService.generateJwt(user.id);
-    res.json({ token, user });
+    return res.json({ token, user });
   } catch (err) {
     next(err);
   }
@@ -29,7 +29,7 @@ const forgotPassword = async (req: Request, res: Response, next: NextFunction) =
   try {
     await AuthService.sendResetPasswordEmail(email);
     // 204: no content, but client knows email was sent
-    res.sendStatus(204);
+    return res.sendStatus(204);
   } catch (err) {
     next(err);
   }
@@ -39,7 +39,7 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
   const { token, newPassword } = req.body;
   try {
     await AuthService.resetPassword(token, newPassword);
-    res.sendStatus(204);
+    return res.sendStatus(204);
   } catch (err) {
     next(err);
   }
@@ -49,7 +49,7 @@ const setPassword = async (req: Request, res: Response, next: NextFunction) => {
   const { token, newPassword } = req.body;
   try {
     await AuthService.setPassword(token, newPassword);
-    res.sendStatus(204);
+    return res.sendStatus(204);
   } catch (err) {
     next(err);
   }
@@ -60,7 +60,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Campos requeridos.
     if (!username || !password || !email || !first_name || !last_name) {
-      res.status(422).json("Faltan datos.");
+      return res.status(422).json("Faltan datos.");
     }
 
     // Verificar que son datos válidos.
@@ -68,7 +68,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     || !inputUtils.isValidEmail(email)
     || !inputUtils.isValidName(first_name)
     || !inputUtils.isValidName(last_name)) {
-      res.status(400).json("Los datos no están en el formato requerido.");
+      return res.status(400).json("Los datos no están en el formato requerido.");
     }
     
     // Quitar espacios en blanco (a excepción de la contraseña).
@@ -80,7 +80,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
       last_name: last_name.trim()
     };
     const userDB = await AuthService.createUser(user);
-    res.status(201).json(userDB);
+    return res.status(201).json(userDB);
   } catch (err) {
     next(err);
   }
@@ -98,7 +98,7 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
       last_name
     };
     const userDB = await AuthService.updateUser(user);
-      res.status(201).json(userDB);
+      return res.status(201).json(userDB);
   } catch (err) {
     next(err);
   }

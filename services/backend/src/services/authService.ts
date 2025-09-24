@@ -56,7 +56,7 @@ class AuthService {
         </body>
       </html>
     `;
-    const htmlBody = ejs.render(template);
+    const htmlBody = ejs.render(template, { user, link });
     
     await transporter.sendMail({
       from: "info@example.com",

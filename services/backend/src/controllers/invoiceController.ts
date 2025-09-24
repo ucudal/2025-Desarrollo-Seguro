@@ -7,7 +7,7 @@ const listInvoices = async (req: Request, res: Response, next: NextFunction) => 
     const state = req.query.status as string | undefined;
     const id   = (req as any).user!.id; 
     const invoices = await InvoiceService.list(id, state);
-    res.json(invoices);
+    return res.json(invoices);
   } catch (err) {
     next(err);
   }
@@ -34,7 +34,7 @@ const setPaymentCard = async (req: Request, res: Response, next: NextFunction) =
       expirationDate
     );
 
-    res.status(200).json({ message: 'Payment successful' });
+    return res.status(200).json({ message: 'Payment successful' });
   } catch (err) {
     next(err);
   }
@@ -68,7 +68,7 @@ const getInvoice = async (req: Request, res: Response, next: NextFunction) => {
     const invoiceId = req.params.id;
     // También se envía la id de usuario al servicio.
     const invoice = await InvoiceService.getInvoice(invoiceId, userId);
-    res.status(200).json(invoice);
+    return res.status(200).json(invoice);
 
   } catch (err) {
     next(err);

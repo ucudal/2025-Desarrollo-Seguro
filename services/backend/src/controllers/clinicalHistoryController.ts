@@ -7,7 +7,7 @@ export const listClinicalHistory = async (req: Request, res: Response, next: Nex
     const to   = req.query.to   ? new Date(req.query.to as string)   : undefined;
     const id   = (req as any).user!.id; 
     const list = await ClinicalHistoryService.list(id, { from, to });
-    res.json(list);
+    return res.json(list);
   } catch (err) {
     next(err);
   }
@@ -17,7 +17,7 @@ export const getClinicalHistory = async (req: Request, res: Response, next: Next
   try {
     const id   = (req as any).user!.id; 
     const record = await ClinicalHistoryService.getById(req.params.id, id);
-    res.json(record);
+    return res.json(record);
   } catch (err) {
     next(err);
   }
@@ -35,7 +35,7 @@ export const createClinicalHistory = async (req: Request, res: Response, next: N
       diagnose,
       files: undefined
     */
-    res.status(201).json(created);
+    return res.status(201).json(created);
   } catch (err) {
     next(err);
   }
