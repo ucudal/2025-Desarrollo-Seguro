@@ -17,7 +17,8 @@ async function main() {
   try {
     // Usuarios que sus datos sensibles no están hasheados.
     const users = await db<UserRow>('users')
-    .select('id', 'username', 'email', 'password', 'invite_token', 'reset_password_token');
+    .select('id', 'username', 'email', 'password',
+	    'invite_token', 'reset_password_token');
 
     console.log(`Hay ${users.length} usuarios.`);
 
@@ -25,17 +26,21 @@ async function main() {
     for (const user of users) {
       const needs_password_hash = !looksLikeBcryptHash(user.password);
       const needs_invite_token_hash = !looksLikeBcryptHash(user.invite_token);
-      const needs_reset_password_token_hash = !looksLikeBcryptHash(user.reset_password_token)
+      const needs_reset_password_token_hash =
+	      !looksLikeBcryptHash(user.reset_password_token);
 
       console.log(`\nUsuario 
         id=${user.id} 
         username=${user.username} 
         email=${user.email}`);
-      console.log(` - tiene password?: ${user.password ? 'sí' : 'no'}  
+      console.log(` - tiene password?: 
+	      ${user.password ? 'sí' : 'no'}  
         necesita hash?: ${needs_password_hash}`);
-      console.log(` - tiene invite_token?: ${user.invite_token ? 'sí' : 'no'}  
+      console.log(` - tiene invite_token?: 
+	      ${user.invite_token ? 'sí' : 'no'}  
         necesita hash?: ${needs_invite_token_hash}`);
-      console.log(` - tiene reset_password_token?: ${user.reset_password_token ? 'sí' : 'no'}  
+      console.log(` - tiene reset_password_token?:
+				${user.reset_password_token ? 'sí' : 'no'}  
         necesita hash?: ${needs_reset_password_token_hash}`);
 
       if (!needs_password_hash
@@ -54,15 +59,15 @@ async function main() {
       await db.transaction(async (trx) => {
         const updates: Partial<UserRow> = {};
         if (needs_password_hash && user.password) {
-          const hashed_password = await hashUtils.hashPlainText(user.password)
+          const hashed_password = await hashUtils.hashPlainText(user.password);
           updates.password = hashed_password;
         }
         if (needs_invite_token_hash && user.invite_token) {
-          const hashed_token = await hashUtils.hashPlainText(user.invite_token)
+          const hashed_token = await hashUtils.hashPlainText(user.invite_token);
           updates.invite_token = hashed_token;
         }
         if (needs_reset_password_token_hash && user.reset_password_token) {
-          const hashed_token = await hashUtils.hashPlainText(user.reset_password_token)
+          const hashed_token = await hashUtils.hashPlainText(user.reset_password_token);
           updates.reset_password_token = hashed_token;
         }
         if (Object.keys(updates).length > 0) {
@@ -75,7 +80,8 @@ async function main() {
       });
     }
 
-    console.log(`\nCompletado. Total de filas (usuarios) actualizadas: ${updated_count}`);
+    console.log(`\nCompletado. Total de filas (usuarios) actualizadas:
+	    ${updated_count}`);
   } catch (err) {
     console.error('ERROR durante la migración:', err);
   } finally {
