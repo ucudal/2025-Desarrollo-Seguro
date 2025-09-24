@@ -21,7 +21,7 @@ class AuthService {
     // create invite token
     const invite_token = crypto.randomBytes(6).toString('hex');
     const invite_token_expires = new Date(Date.now() + INVITE_TTL);
-    // VULNERABILIDAD: almacenar la contraseña en texto plano expone credenciales ante una brecha.
+    // VULNERABILIDAD: almacenar la contrasenia en texto plano expone credenciales ante una brecha.
     // await db<UserRow>('users')
     //   .insert({
     //     username: user.username,
@@ -95,7 +95,7 @@ class AuthService {
       .where({ id: user.id })
       .first();
     if (!existing) throw new Error('User not found');
-    // VULNERABILIDAD: actualizar la contraseña sin hash mantiene el almacén inseguro.
+    // VULNERABILIDAD: actualizar la contrasenia sin hash mantiene el almacén inseguro.
     // await db<UserRow>('users')
     //   .where({ id: user.id })
     //   .update({
@@ -106,7 +106,7 @@ class AuthService {
     //     last_name: user.last_name
     //   });
 
-    // MITIGACIÓN: recalcular el hash cuando se actualiza la contraseña.
+    // MITIGACIÓN: recalcular el hash cuando se actualiza la contrasenia.
     const updatedPassword = user.password
       ? await bcrypt.hash(user.password, 12)
       : existing.password;
@@ -128,10 +128,10 @@ class AuthService {
       .andWhere('activated', true)
       .first();
     if (!user) throw new Error('Invalid email or not activated');
-    // 🔴 VULNERABILIDAD: comparar textos planos permite que contraseñas en la base sigan sin hash.
+    // VULNERABILIDAD: comparar textos planos permite que contraseñas en la base sigan sin hash.
     // if (password != user.password) throw new Error('Invalid password');
 
-    // ✅ MITIGACIÓN: usar bcrypt.compare contra el hash almacenado.
+    // MITIGACIÓN: usar bcrypt.compare contra el hash almacenado.
     const passwordMatches = await bcrypt.compare(password, user.password);
     if (!passwordMatches) throw new Error('Invalid password');
     return user;
@@ -179,7 +179,7 @@ class AuthService {
       .first();
     if (!row) throw new Error('Invalid or expired reset token');
 
-    // 🔴 VULNERABILIDAD: guardar el nuevo password sin hash mantiene el riesgo.
+    // VULNERABILIDAD: guardar el nuevo password sin hash mantiene el riesgo.
     // await db('users')
     //   .where({ id: row.id })
     //   .update({
@@ -188,7 +188,7 @@ class AuthService {
     //     reset_password_expires: null
     //   });
 
-    // ✅ MITIGACIÓN: persistir sólo el hash del nuevo password.
+    // MITIGACIÓN: persistir solo el hash de la nuevo contrasenia.
     const hashedResetPassword = await bcrypt.hash(newPassword, 12);
     await db('users')
       .where({ id: row.id })
@@ -206,7 +206,7 @@ class AuthService {
       .first();
     if (!row) throw new Error('Invalid or expired invite token');
 
-    // 🔴 VULNERABILIDAD: almacenar el password de activación en claro.
+    // VULNERABILIDAD: almacenar la contrasenia de activación en claro.
     // await db('users')
     //   .update({
     //     password: newPassword,
@@ -215,7 +215,7 @@ class AuthService {
     //   })
     //   .where({ id: row.id });
 
-    // ✅ MITIGACIÓN: hash antes de activar la cuenta.
+    // MITIGACIÓN: hash antes de activar la cuenta.
     const hashedNewPassword = await bcrypt.hash(newPassword, 12);
     await db('users')
       .update({

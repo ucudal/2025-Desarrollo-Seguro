@@ -8,14 +8,14 @@ exports.seed = async function(knex) {
 
   const hashedPassword = await bcrypt.hash('password', 12);
   const hashedPasswordProd = await bcrypt.hash('password', 12);
-
+  // VULNERABILIDAD: sembrar contraseñas en texto plano facilita ataques si se filtra la base inicial.
+  // password: 'password',
+  // MITIGACIÓN: almacenar únicamente hashes seguros.
   await knex('users').insert({
     id: 1,
     username: 'test',
     email: 'test@example.local',
-    // VULNERABILIDAD: sembrar contraseñas en texto plano facilita ataques si se filtra la base inicial.
-    // password: 'password',
-    // MITIGACIÓN: almacenar únicamente hashes seguros.
+
     password: hashedPassword,
     first_name: 'Test',
     last_name: 'User',
@@ -30,9 +30,6 @@ exports.seed = async function(knex) {
     id: 2,
     username: 'prod',
     email: 'prod@example.local',
-    // VULNERABILIDAD: sembrar contraseñas en texto plano facilita ataques si se filtra la base inicial.
-    // password: 'password',
-    // MITIGACIÓN: almacenar únicamente hashes seguros.
     password: hashedPasswordProd,
     first_name: 'Prod',
     last_name: 'User',
