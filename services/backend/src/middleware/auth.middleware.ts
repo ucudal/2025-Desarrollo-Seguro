@@ -14,6 +14,10 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
 
   const token = authHeader.split(' ')[1];
 
+  // VULNERABILIDAD: guardar el secreto JWT embebido en el codigo permite al atacante generar un token falso
+
+  // MITIGACIÓN: almacenar el secreto JWT en el archivo de entorno .env
+
   try {
     const secret = process.env.JWT_SECRET || "";
     if (!secret) {

@@ -15,6 +15,10 @@ interface InvoiceRow {
 }
 
 class InvoiceService {
+  //VULNERABILIDAD: SQL Injection al concatenar entradas del usuario sin previa validacion a la consulta SQL
+
+  //MITIGACION: Validar las entradas del usuario y pasar status como binding en Knex
+
   static async list(userId: string, status?: string, operator?: string): Promise<Invoice[]> {
     let q = db<InvoiceRow>('invoices').where({ userId: userId });
 
