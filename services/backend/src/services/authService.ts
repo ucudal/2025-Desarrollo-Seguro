@@ -48,6 +48,7 @@ class AuthService {
     });
     const link = `${process.env.FRONTEND_URL}/activate-user?token=${invite_token}&username=${user.username}`;
    
+    // Usar etiquetas <%=  %>
     const template = `
       <html>
         <body>
@@ -56,6 +57,7 @@ class AuthService {
         </body>
       </html>
     `;
+    // Pasar las variables como parámetros.
     const htmlBody = ejs.render(template, { user, link });
     
     await transporter.sendMail({
