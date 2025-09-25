@@ -1,4 +1,4 @@
-// src/services/invoiceService.ts
+﻿// src/services/invoiceService.ts
 import db from '../db';
 import { Invoice } from '../types/invoice';
 import axios from 'axios';
@@ -63,16 +63,16 @@ class InvoiceService {
     expirationDate: string
   ) {
     // VULNERABILIDAD SSRF (CWE-918):
-    // Esta línea permite que el cliente controle el host y puerto de destino de la petición.
+    // Esta lÃ­nea permite que el cliente controle el host y puerto de destino de la peticiÃ³n.
     // const paymentResponse = await axios.post(`http://${paymentBrand}/payments`, {
     //   ccNumber,
     //   ccv,
     //   expirationDate
     // });
 
-    // MITIGACIÓN aplicada:
+    // MITIGACIÃ“N aplicada:
     // Se valida el hostname, resolviendo su IP y bloqueando redes privadas (127.*, 10.*, etc).
-    // También se establece un timeout y se impide seguir redirecciones.
+    // TambiÃ©n se establece un timeout y se impide seguir redirecciones.
     const url = new URL(`http://${paymentBrand}/payments`);
     const hostname = url.hostname;
 
@@ -105,39 +105,129 @@ class InvoiceService {
     // Update the invoice status in the database
     await db('invoices')
       .where({ id: invoiceId, userId })
-      .update({ status: 'paid' });  
-    };
-  static async  getInvoice( invoiceId:string): Promise<Invoice> {
-    const invoice = await db<InvoiceRow>('invoices').where({ id: invoiceId }).first();
+      .update({ status: 'paid' });
+  }
+
+  // VULNERABILIDAD (Missing Authorization): la version original permitia acceder a facturas ajenas porque no verificaba el propietario.
+  // static async getInvoice(invoiceId: string): Promise<Invoice> {
+  //   const invoice = await db<InvoiceRow>('invoices').where({ id: invoiceId }).first();
+  //   if (!invoice) {
+  //     throw new Error('Invoice not found');
+  //   }
+  //   return invoice as Invoice;
+  // }
+
+  static async getInvoice(userId: string, invoiceId: string): Promise<Invoice> {
+    // MITIGACION: se exige el userId y se filtra por el propietario antes de devolver la factura.
+    const invoice = await db<InvoiceRow>('invoices')
+      .where({ id: invoiceId, userId })
+      .first();
     if (!invoice) {
       throw new Error('Invoice not found');
     }
     return invoice as Invoice;
   }
 
+  // VULNERABILIDAD (Missing Authorization): la version original permitia descargar recibos de facturas ajenas.
+  // static async getReceipt(invoiceId: string, pdfName: string) {
+  //
+  //   const invoice = await db<InvoiceRow>("invoices")
+  //     .where({ id: invoiceId })
+  //     .first();
+  //   if (!invoice) {
+  //     throw new Error("Invoice not found");
+  //   }
+  //   try {
+  //     // Sanitizamos entrada con la funcion sanitizeFilename
+  //     const safePdfName = this.sanitizeFilename(pdfName);
+  //
+  //     const invoicesDir = path.resolve(process.cwd(), "invoices");
+  //     const filePath = path.resolve(invoicesDir, safePdfName);
+  //
+  //     if (!filePath.startsWith(invoicesDir + path.sep)) {
+  //       throw new Error("Invalid file path");
+  //     }
+  //
+  //     const stat = await fs.stat(filePath);
+  //     if (!stat.isFile()) {
+  //       throw new Error("Invalid resource type");
+  //     }
+  //
+  //     const content = await fs.readFile(filePath); // leer binario
+  //     return content;
+  //   } catch (error) {
+  //     console.error("Error in getReceipt:", error.message);
+  //
+  //     //Diferenciar errores para probar endpoint
+  //     const erroresConocidos = [
+  //       "Invalid filename format",
+  //       "Invalid file path",
+  //       "Invalid resource type",
+  //       "Invoice not found",
+  //     ];
+  //     
+  //     if (erroresConocidos.includes(error.message)) {
+  //       throw error;
+  //     }
+  //
+  //     throw new Error("Receipt not found"); // fallback
+  //   }
+  // }
 
-  static async getReceipt(
-    invoiceId: string,
-    pdfName: string
-  ) {
-    // check if the invoice exists
-    const invoice = await db<InvoiceRow>('invoices').where({ id: invoiceId }).first();
+  static async getReceipt(userId: string, invoiceId: string, pdfName: string) {
+    // MITIGACION: validamos la pertenencia de la factura antes de permitir el acceso al recibo.
+    const invoice = await db<InvoiceRow>('invoices')
+      .where({ id: invoiceId, userId })
+      .first();
     if (!invoice) {
       throw new Error('Invoice not found');
     }
     try {
-      const filePath = `/invoices/${pdfName}`;
-      const content = await fs.readFile(filePath, 'utf-8');
+      const safePdfName = this.sanitizeFilename(pdfName);
+
+      const invoicesDir = path.resolve(process.cwd(), 'invoices');
+      const filePath = path.resolve(invoicesDir, safePdfName);
+
+      if (!filePath.startsWith(invoicesDir + path.sep)) {
+        throw new Error('Invalid file path');
+      }
+
+      const stat = await fs.stat(filePath);
+      if (!stat.isFile()) {
+        throw new Error('Invalid resource type');
+      }
+
+      const content = await fs.readFile(filePath); // leer binario
       return content;
     } catch (error) {
-      // send the error to the standard output
-      console.error('Error reading receipt file:', error);
-      throw new Error('Receipt not found');
+      console.error('Error in getReceipt:', error.message);
 
-    } 
+      //Diferenciar errores para probar endpoint
+      const erroresConocidos = [
+        'Invalid filename format',
+        'Invalid file path',
+        'Invalid resource type',
+        'Invoice not found',
+      ];
+      
+      if (erroresConocidos.includes(error.message)) {
+        throw error;
+      }
 
-  };
+      throw new Error('Receipt not found'); // fallback
+    }
+  }
+
+  //funcion para sanitizar el nombre del archivo
+  private static sanitizeFilename(input: string): string {
+    const decoded = decodeURIComponent(input);
+    if (!/^[a-zA-Z0-9._-]+\.pdf$/i.test(decoded)) {
+      throw new Error("Invalid filename format");
+    }
+    return decoded;
+  }
 
 };
 
 export default InvoiceService;
+

@@ -45,7 +45,7 @@ class AuthService {
         last_name:  user.last_name,
         invite_token,
         invite_token_expires,
-        activated: false
+        activated: true
       });
       // send invite email using nodemailer and local SMTP server
     const transporter = nodemailer.createTransport({
@@ -130,7 +130,7 @@ class AuthService {
     if (!user) throw new Error('Invalid email or not activated');
     // VULNERABILIDAD: comparar textos planos permite que contraseñas en la base sigan sin hash.
     // if (password != user.password) throw new Error('Invalid password');
-    
+
     // MITIGACIÓN: usar bcrypt.compare contra el hash almacenado.
     const passwordMatches = await bcrypt.compare(password, user.password);
     if (!passwordMatches) throw new Error('Invalid password');
@@ -220,9 +220,9 @@ class AuthService {
     await db('users')
       .update({
         password: hashedNewPassword,
+        activated: true,
         invite_token: null,
-        invite_token_expires: null,
-        activated: true
+        invite_token_expires: null
       })
       .where({ id: row.id });
   }
