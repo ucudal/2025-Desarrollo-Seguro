@@ -2,13 +2,19 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> } 
  */
-exports.seed = async function(knex) {
+const bcrypt = require('bcrypt');
 
+exports.seed = async function(knex) {
+  const hashedPassword = await bcrypt.hash('password', 12);
+  const hashedPasswordProd = await bcrypt.hash('password', 12);
+  // VULNERABILIDAD: sembrar contraseñas en texto plano facilita ataques si se filtra la base inicial.
+  // password: 'password',
+  // MITIGACIÓN: almacenar únicamente hashes seguros.
   const usersIds = await knex('users').insert([
     {
     username: 'test',
     email: 'test@example.local',
-    password: 'password',
+    password: hashedPassword,
     first_name: 'Test',
     last_name: 'User',
     activated: true,
@@ -17,10 +23,11 @@ exports.seed = async function(knex) {
     invite_token: null,
     invite_token_expires: null,
     picture_path: null
-    },{
+    },
+    {
     username: 'prod',
     email: 'prod@example.local',
-    password: 'password',
+    password: hashedPasswordProd,
     first_name: 'Prod',
     last_name: 'User',
     activated: true,
